@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One-Tap Rental — Digital Rental Service</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F5F4F1;
+  --bg-card: #FFFFFF;
+  --bg-dark: #1A1A1C;
+  --bg-dark-soft: #252528;
+  --bg-muted: #EDECE8;
+  --bg-accent-pale: #E6EDF7;
+  --accent: #1155CC;
+  --accent-hover: #0D44A6;
+  --accent-light: #8FAED4;
+  --charcoal: #1A1A1C;
+  --text: #1A1A1C;
+  --text-sec: #6B6B70;
+  --text-ter: #AEAEB2;
+  --white: #FFFFFF;
+  --green: #2DA44E;
+  --green-bg: #DAFBE1;
+  --orange: #D97706;
+  --orange-bg: #FEF3C7;
+  --red: #CF222E;
+  --red-bg: #FFEBE9;
+  --border: #E5E5EA;
+  --border-light: #F0EFED;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.10);
+  --r: 14px;
+  --r-sm: 10px;
+  --r-xs: 6px;
+  --font: 'DM Sans', sans-serif;
+  --font-display: 'Instrument Serif', serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ═══ SCREEN NAV ═══ */
+.screen-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--bg-dark); padding: 10px 24px; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.screen-nav button { font-family: var(--font); font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: var(--r-xs); border: 1px solid rgba(255,255,255,0.1); background: transparent; color: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.2s; letter-spacing: 0.2px; }
+.screen-nav button:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+.screen-nav button.active { background: var(--accent); color: var(--white); border-color: var(--accent); }
+
+/* ═══ SCREENS ═══ */
+.screen { display: none; min-height: 100vh; padding-top: 52px; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ═══ TOP NAV ═══ */
+.top-nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 48px; border-bottom: 1px solid var(--border-light); background: var(--bg-card); position: sticky; top: 52px; z-index: 100; }
+.top-nav .left { display: flex; align-items: center; gap: 24px; }
+.top-nav .logo { font-family: var(--font-display); font-size: 22px; color: var(--charcoal); font-weight: 400; letter-spacing: -0.3px; }
+.top-nav .logo em { font-style: italic; color: var(--accent); }
+.top-nav .back-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-sec); background: none; border: none; cursor: pointer; font-family: var(--font); }
+.top-nav .back-btn:hover { color: var(--text); }
+.top-nav .right { display: flex; align-items: center; gap: 16px; }
+.top-nav .avatar { width: 36px; height: 36px; border-radius: 18px; background: var(--bg-accent-pale); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--accent); }
+.top-nav .step-label { font-size: 13px; color: var(--text-sec); font-weight: 500; }
+
+/* ═══ PROGRESS BAR ═══ */
+.progress-bar { display: flex; gap: 4px; width: 240px; }
+.progress-bar .step { flex: 1; height: 3px; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+.progress-bar .step.done { background: var(--accent); }
+
+/* ═══ BUTTONS ═══ */
+.btn { font-family: var(--font); font-weight: 600; border: none; cursor: pointer; border-radius: var(--r-sm); display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s; font-size: 14px; padding: 12px 24px; letter-spacing: 0.1px; }
+.btn-primary { background: var(--charcoal); color: var(--white); }
+.btn-primary:hover { background: #2C2C2E; }
+.btn-accent { background: var(--accent); color: var(--white); }
+.btn-accent:hover { background: var(--accent-hover); }
+.btn-outline { background: transparent; color: var(--charcoal); border: 1.5px solid var(--border); }
+.btn-outline:hover { border-color: var(--charcoal); }
+.btn-ghost { background: transparent; color: var(--accent); }
+.btn-success { background: var(--green); color: var(--white); }
+.btn-sm { font-size: 12px; padding: 7px 14px; }
+.btn-full { width: 100%; }
+.btn:disabled { opacity: 0.35; cursor: default; }
+
+/* ═══ CARDS ═══ */
+.card { background: var(--bg-card); border-radius: var(--r); box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); }
+.card-clickable { cursor: pointer; transition: box-shadow 0.15s, transform 0.15s; }
+.card-clickable:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+/* ═══ TAGS ═══ */
+.tag { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.3px; display: inline-block; }
+.tag-accent { background: rgba(17,85,204,0.1); color: var(--accent); }
+.tag-green { background: var(--green-bg); color: var(--green); }
+.tag-orange { background: var(--orange-bg); color: var(--orange); }
+.tag-dark { background: var(--accent); color: var(--white); }
+.tag-white { background: rgba(255,255,255,0.9); color: var(--charcoal); }
+
+/* ═══ INPUTS ═══ */
+.input-field { width: 100%; padding: 12px 16px; font-family: var(--font); font-size: 15px; border: 1.5px solid var(--border); border-radius: var(--r-sm); outline: none; background: var(--bg-card); color: var(--charcoal); transition: border-color 0.2s; }
+.input-field:focus { border-color: var(--accent); }
+.input-label { font-size: 13px; font-weight: 500; color: var(--text-sec); display: block; margin-bottom: 6px; }
+.section-label { font-size: 12px; font-weight: 600; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.fade-up { animation: fadeUp 0.5s ease both; }
+.fade-up-1 { animation-delay: 0.05s; }
+.fade-up-2 { animation-delay: 0.1s; }
+.fade-up-3 { animation-delay: 0.15s; }
+.fade-up-4 { animation-delay: 0.2s; }
+
+/* ═══ SCREEN 0: LISTINGS + MAP ═══ */
+.s0-search-bar { padding: 14px 48px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--border-light); background: var(--bg-card); }
+.s0-search-input { flex: 1; display: flex; align-items: center; gap: 10px; background: var(--bg); border-radius: var(--r-sm); padding: 10px 16px; border: 1px solid var(--border); font-size: 14px; color: var(--text-sec); }
+.s0-filter { padding: 10px 16px; border-radius: var(--r-sm); border: 1px solid var(--border); font-family: var(--font); font-size: 13px; color: var(--text); background: var(--bg-card); cursor: pointer; font-weight: 500; transition: all 0.15s; }
+.s0-filter:hover { border-color: var(--charcoal); }
+.s0-main { flex: 1; display: flex; overflow: hidden; }
+.s0-map { width: 50%; position: relative; background: var(--bg-muted); overflow: hidden; }
+.s0-map img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+.s0-map-overlay { position: absolute; inset: 0; background: rgba(237,236,233,0.15); }
+.s0-marker { position: absolute; transform: translate(-50%,-50%); font-family: var(--font); font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 8px; box-shadow: var(--shadow-md); cursor: pointer; transition: all 0.15s; z-index: 1; }
+.s0-marker:hover { transform: translate(-50%,-50%) scale(1.08); }
+.s0-marker-default { background: var(--bg-card); color: var(--charcoal); border: 1px solid var(--border); }
+.s0-marker-active { background: var(--charcoal); color: var(--white); z-index: 2; }
+.s0-map-stats { position: absolute; bottom: 20px; left: 20px; display: flex; gap: 8px; }
+.s0-map-stat { background: rgba(255,255,255,0.95); padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; color: var(--charcoal); box-shadow: var(--shadow-sm); backdrop-filter: blur(8px); }
+.s0-neighbourhood-ring { position: absolute; left: 12%; top: 18%; width: 32%; height: 45%; border: 2px dashed var(--accent); border-radius: 50%; opacity: 0.25; pointer-events: none; }
+.s0-listings { width: 50%; overflow-y: auto; padding: 24px 32px; max-height: calc(100vh - 52px - 57px - 55px); }
+.s0-listing { display: flex; overflow: hidden; margin-bottom: 16px; }
+.s0-listing-img { width: 240px; height: 180px; position: relative; flex-shrink: 0; overflow: hidden; }
+.s0-listing-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.s0-listing:hover .s0-listing-img img { transform: scale(1.04); }
+.s0-listing-body { flex: 1; padding: 16px 20px; display: flex; flex-direction: column; justify-content: space-between; }
+.s0-listing-title { font-size: 17px; font-weight: 600; }
+.s0-listing-addr { font-size: 13px; color: var(--text-sec); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+.s0-listing-features { display: flex; gap: 16px; margin-top: 10px; font-size: 13px; color: var(--text-sec); }
+.s0-listing-price { font-size: 20px; font-weight: 700; }
+.s0-listing-price span { font-size: 12px; font-weight: 400; color: var(--text-sec); }
+.s0-listing-bottom { display: flex; justify-content: space-between; align-items: center; }
+.s0-listing-owner { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-sec); }
+.s0-owner-avatar { width: 24px; height: 24px; border-radius: 12px; background: var(--bg-accent-pale); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--accent); }
+.s0-score { position: absolute; top: 10px; right: 48px; background: rgba(0,0,0,0.6); border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 600; color: var(--white); display: flex; align-items: center; gap: 3px; }
+.s0-fav { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s; }
+.s0-fav:hover { transform: scale(1.1); }
+
+/* ═══ CENTERED LAYOUT ═══ */
+.centered-layout { flex: 1; display: flex; align-items: center; justify-content: center; padding: 48px; }
+.centered-content { width: 100%; max-width: 520px; }
+.centered-wide { max-width: 600px; }
+
+/* ═══ SPLIT LAYOUT ═══ */
+.split-layout { flex: 1; display: flex; padding: 32px 48px; gap: 32px; overflow: hidden; }
+.split-main { flex: 1; overflow-y: auto; }
+.split-side { width: 380px; flex-shrink: 0; overflow-y: auto; }
+
+/* ═══ SCREEN 3: CHAT ═══ */
+.chat-layout { flex: 1; display: flex; overflow: hidden; }
+.chat-sidebar { width: 320px; border-right: 1px solid var(--border-light); overflow-y: auto; }
+.chat-sidebar-search { padding: 16px 20px; border-bottom: 1px solid var(--border-light); }
+.chat-contact { padding: 14px 20px; display: flex; gap: 12px; cursor: pointer; transition: background 0.1s; }
+.chat-contact:hover { background: var(--bg-muted); }
+.chat-contact.active { background: var(--bg-accent-pale); border-left: 3px solid var(--accent); }
+.chat-contact-avatar { width: 44px; height: 44px; border-radius: 22px; background: var(--accent); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 700; font-size: 16px; flex-shrink: 0; }
+.chat-main { flex: 1; display: flex; flex-direction: column; }
+.chat-header { padding: 12px 24px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 20px 32px; display: flex; flex-direction: column; gap: 12px; }
+.chat-bubble { max-width: 55%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5; }
+.chat-bubble-owner { background: var(--bg-card); border: 1px solid var(--border-light); align-self: flex-start; }
+.chat-bubble-user { background: var(--charcoal); color: var(--white); align-self: flex-end; }
+.chat-bubble-system { background: var(--bg-accent-pale); align-self: center; font-style: italic; max-width: 70%; text-align: center; }
+.chat-bubble-time { font-size: 10px; color: var(--text-ter); text-align: right; margin-top: 4px; }
+.chat-bubble-user .chat-bubble-time { color: rgba(255,255,255,0.45); }
+.chat-actions { display: flex; gap: 8px; padding: 8px 32px; }
+.chat-input-row { display: flex; align-items: center; gap: 12px; padding: 12px 32px 16px; border-top: 1px solid var(--border-light); }
+.chat-input { flex: 1; padding: 10px 16px; border: 1.5px solid var(--border); border-radius: 24px; outline: none; font-family: var(--font); font-size: 14px; }
+.chat-input:focus { border-color: var(--accent); }
+.chat-send { background: var(--charcoal); border: none; width: 40px; height: 40px; border-radius: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+/* ═══ SCREEN 4: VIEWING ═══ */
+.viewing-map { flex: 1; border-radius: var(--r); overflow: hidden; position: relative; min-height: 400px; }
+.viewing-map img { width: 100%; height: 100%; object-fit: cover; }
+.viewing-pin { position: absolute; top: 40%; left: 45%; transform: translate(-50%,-50%); width: 44px; height: 44px; border-radius: 22px; background: var(--accent); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 10px rgba(17,85,204,0.15); }
+
+/* ═══ SCREEN 5: TERM SHEET ═══ */
+.term-row { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: background 0.15s; }
+.term-row:last-child { border-bottom: none; }
+.term-row:hover { background: var(--bg-muted); }
+.term-row.checked { background: var(--green-bg); }
+.term-checkbox { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+.term-row.checked .term-checkbox { background: var(--green); border-color: var(--green); }
+
+/* ═══ SCREEN 6: CONTRACT ═══ */
+.contract-preview { background: var(--bg); border-radius: var(--r-sm); padding: 32px; border: 1px solid var(--border-light); overflow-y: auto; }
+.contract-line { height: 7px; border-radius: 3px; background: var(--border); margin-bottom: 8px; }
+.signature-box { padding: 24px; text-align: center; border: 2px dashed var(--border); border-radius: var(--r); cursor: pointer; transition: all 0.2s; }
+.signature-box:hover { border-color: var(--accent); background: var(--bg-accent-pale); }
+.signature-box.signed { border: 2px solid var(--green); background: var(--green-bg); }
+
+/* ═══ SCREEN 7: PAYMENT ═══ */
+.payment-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-light); font-size: 14px; }
+.payment-row:last-of-type { border-bottom: none; }
+.payment-total { display: flex; justify-content: space-between; padding: 16px 0 0; margin-top: 8px; border-top: 2px solid var(--charcoal); font-size: 18px; font-weight: 700; }
+.payment-method { padding: 16px; margin-bottom: 8px; cursor: pointer; transition: all 0.15s; }
+.payment-method.selected { border: 2px solid var(--accent) !important; }
+.payment-radio { width: 20px; height: 20px; border-radius: 10px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; }
+.payment-method.selected .payment-radio { border-color: var(--accent); }
+.payment-radio-dot { width: 10px; height: 10px; border-radius: 5px; background: var(--accent); display: none; }
+.payment-method.selected .payment-radio-dot { display: block; }
+
+/* ═══ SCREEN 8: ROOMS ═══ */
+.rooms-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.room-card-img { height: 150px; overflow: hidden; position: relative; }
+.room-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.room-card:hover .room-card-img img { transform: scale(1.04); }
+.room-card-body { padding: 16px; }
+.room-progress { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 8px; }
+.room-progress-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+.room-add { display: flex; align-items: center; justify-content: center; min-height: 200px; border: 2px dashed var(--border); cursor: pointer; transition: border-color 0.15s; flex-direction: column; gap: 8px; color: var(--text-ter); }
+.room-add:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ═══ SCREEN 9: ITEM DETAIL ═══ */
+.item-photo { flex: 1; border-radius: var(--r); overflow: hidden; position: relative; min-height: 380px; }
+.item-photo img { width: 100%; height: 100%; object-fit: cover; }
+.item-thumbnails { display: flex; gap: 8px; margin-top: 12px; }
+.item-thumb { width: 80px; height: 60px; border-radius: var(--r-sm); overflow: hidden; border: 2px solid transparent; cursor: pointer; transition: border-color 0.15s; }
+.item-thumb:hover, .item-thumb.active { border-color: var(--accent); }
+.item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.condition-btn { flex: 1; padding: 10px 4px; border-radius: var(--r-sm); border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; font-family: var(--font); font-size: 12px; font-weight: 600; color: var(--text-sec); transition: all 0.2s; }
+.condition-btn.selected { border-width: 2px; }
+.condition-btn:hover { background: var(--bg-muted); }
+
+/* ═══ SCREEN 10: JOINT SIGNING ═══ */
+.signer-card { padding: 20px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s; }
+.signer-card.signed { border: 2px solid var(--green) !important; }
+.signer-avatar { width: 48px; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.spinner { width: 22px; height: 22px; border-radius: 11px; border: 2.5px solid var(--border); border-top-color: var(--accent); animation: spin 1s linear infinite; }
+
+/* ═══ SCREEN 11: DASHBOARD ═══ */
+.dash-hero { background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-dark-soft) 100%); padding: 40px 48px; margin-bottom: 28px; border-radius: var(--r); display: flex; align-items: center; justify-content: space-between; }
+.dash-hero h1 { font-family: var(--font-display); font-size: 32px; color: var(--white); font-weight: 400; }
+.dash-hero p { font-size: 15px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.dash-key-icon { width: 72px; height: 72px; border-radius: 36px; background: rgba(45,164,78,0.15); display: flex; align-items: center; justify-content: center; }
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.dash-action { padding: 18px; cursor: pointer; }
+.dash-action:hover { box-shadow: var(--shadow-md); }
+.timeline-item { display: flex; gap: 14px; padding-bottom: 18px; position: relative; }
+.timeline-dot { width: 10px; height: 10px; border-radius: 5px; flex-shrink: 0; margin-top: 4px; }
+.timeline-line { position: absolute; left: 4px; top: 18px; width: 1.5px; bottom: 0; background: var(--border); }
+
+/* ═══ INFO BOX ═══ */
+.info-box { padding: 16px; border-radius: var(--r-sm); display: flex; gap: 12px; }
+.info-box-accent { background: var(--bg-accent-pale); }
+.info-box-orange { background: var(--orange-bg); }
+.info-box-muted { background: var(--bg-muted); }
+.info-box p { font-size: 12px; line-height: 1.5; margin: 0; }
+
+/* ═══ SVG ICONS (inline) ═══ */
+.icon { display: inline-block; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<!-- SCREEN NAVIGATOR -->
+<div class="screen-nav" id="screenNav"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN 0 — LISTING + NEIGHBOURHOOD MAP
+     ═══════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-0">
+  <nav class="top-nav">
+    <div class="left">
+      <div class="logo">One-Tap <em>Rental</em></div>
+    </div>
+    <div class="right">
+      <div class="avatar">A</div>
+    </div>
+  </nav>
+  <div class="s0-search-bar">
+    <div class="s0-search-input">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B6B70" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21" stroke-linecap="round"/></svg>
+      Moscow, Khamovniki district
+    </div>
+    <button class="s0-filter">1–3 BR</button>
+    <button class="s0-filter">₽30K–80K</button>
+    <button class="s0-filter">Verified only</button>
+    <button class="btn btn-accent btn-sm">Filters</button>
+  </div>
+  <div class="s0-main">
+    <!-- MAP -->
+    <div class="s0-map">
+      <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200&h=900&fit=crop" alt="Map" onerror="this.style.display='none'">
+      <div class="s0-map-overlay"></div>
+      <div class="s0-neighbourhood-ring"></div>
+      <div class="s0-marker s0-marker-active" style="left:28%;top:38%">₽52K</div>
+      <div class="s0-marker s0-marker-default" style="left:55%;top:52%">₽38K</div>
+      <div class="s0-marker s0-marker-default" style="left:42%;top:72%">₽75K</div>
+      <div class="s0-marker s0-marker-default" style="left:72%;top:30%">₽61K</div>
+      <div class="s0-marker s0-marker-default" style="left:18%;top:62%">₽45K</div>
+      <div class="s0-map-stats">
+        <div class="s0-map-stat">Walk Score 92</div>
+        <div class="s0-map-stat">Metro 3 min</div>
+        <div class="s0-map-stat">Parks 5</div>
+        <div class="s0-map-stat">Schools 4.8★</div>
+      </div>
+    </div>
+    <!-- LISTINGS -->
+    <div class="s0-listings">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div>
+          <h2 style="font-family:var(--font-display);font-size:26px;font-weight:400">Khamovniki</h2>
+          <p style="font-size:13px;color:var(--text-sec);margin-top:4px">24 verified listings</p>
+        </div>
+        <span style="font-size:13px;color:var(--text-sec)">Sort: Relevance ▾</span>
+      </div>
+
+      <!-- Listing 1 -->
+      <div class="card card-clickable s0-listing fade-up" onclick="goTo(1)">
+        <div class="s0-listing-img">
+          <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop" alt="Apartment">
+          <div style="position:absolute;top:10px;left:10px"><span class="tag tag-dark">Verified</span></div>
+          <div class="s0-score">★ 4.8</div>
+          <button class="s0-fav" onclick="event.stopPropagation()">♡</button>
+        </div>
+        <div class="s0-listing-body">
+          <div>
+            <div class="s0-listing-title">Spacious 2BR in Khamovniki</div>
+            <div class="s0-listing-addr">📍 Ul. Lva Tolstogo, 23</div>
+            <div class="s0-listing-features"><span>🛏 2</span><span>🛁 1</span><span>📐 68 m²</span></div>
+          </div>
+          <div class="s0-listing-bottom">
+            <div class="s0-listing-owner">
+              <div class="s0-owner-avatar">A</div>
+              <span>Owner</span>
+              <span style="color:var(--green);font-weight:600">✓ Verified</span>
+            </div>
+            <div class="s0-listing-price">₽52,000 <span>/ mo</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Listing 2 -->
+      <div class="card card-clickable s0-listing fade-up fade-up-1">
+        <div class="s0-listing-img">
+          <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop" alt="Studio">
+          <div style="position:absolute;top:10px;left:10px"><span class="tag tag-dark">Verified</span></div>
+          <div class="s0-score">★ 4.5</div>
+          <button class="s0-fav" onclick="event.stopPropagation()">♡</button>
+        </div>
+        <div class="s0-listing-body">
+          <div>
+            <div class="s0-listing-title">Modern Studio near Arbat</div>
+            <div class="s0-listing-addr">📍 Arbatskaya ul., 12</div>
+            <div class="s0-listing-features"><span>🛏 1</span><span>🛁 1</span><span>📐 42 m²</span></div>
+          </div>
+          <div class="s0-listing-bottom">
+            <div class="s0-listing-owner"><div class="s0-owner-avatar">M</div><span>Owner</span><span style="color:var(--green);font-weight:600">✓</span></div>
+            <div class="s0-listing-price">₽38,000 <span>/ mo</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Listing 3 -->
+      <div class="card card-clickable s0-listing fade-up fade-up-2">
+        <div class="s0-listing-img">
+          <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop" alt="Family Apt">
+          <div style="position:absolute;top:10px;left:10px"><span class="tag tag-dark">Verified</span></div>
+          <div class="s0-score">★ 4.9</div>
+          <button class="s0-fav" onclick="event.stopPropagation()">♡</button>
+        </div>
+        <div class="s0-listing-body">
+          <div>
+            <div class="s0-listing-title">3BR Family Apartment</div>
+            <div class="s0-listing-addr">📍 Prechistenka ul., 8</div>
+            <div class="s0-listing-features"><span>🛏 3</span><span>🛁 2</span><span>📐 95 m²</span></div>
+          </div>
+          <div class="s0-listing-bottom">
+            <div class="s0-listing-owner"><div class="s0-owner-avatar">K</div><span>Owner</span><span style="color:var(--green);font-weight:600">✓</span></div>
+            <div class="s0-listing-price">₽75,000 <span>/ mo</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 1 — ID VERIFICATION GATE ═══ -->
+<div class="screen" id="screen-1">
+  <nav class="top-nav"><div class="left"><button class="back-btn" onclick="goTo(0)">← Back</button><div class="logo">One-Tap <em>Rental</em></div></div><div class="right"><span class="step-label">Identity Verification</span><div class="avatar">A</div></div></nav>
+  <div class="centered-layout">
+    <div class="centered-content" style="text-align:center">
+      <div style="width:88px;height:88px;border-radius:44px;background:var(--bg-accent-pale);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:40px">🛡️</div>
+      <h1 style="font-family:var(--font-display);font-size:32px;font-weight:400;margin-bottom:8px">Verify your identity</h1>
+      <p style="font-size:15px;color:var(--text-sec);line-height:1.6;margin-bottom:32px">To contact the owner and proceed with the rental, verify your identity through a government-grade check.</p>
+      <div class="card card-clickable fade-up" style="padding:24px;margin-bottom:12px;text-align:left" onclick="goTo(2)">
+        <div style="display:flex;align-items:center;gap:20px">
+          <div style="width:56px;height:56px;border-radius:14px;background:var(--bg-accent-pale);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">🔐</div>
+          <div style="flex:1"><div style="font-size:17px;font-weight:600">ESIA / Gosuslugi</div><div style="font-size:13px;color:var(--text-sec);margin-top:4px">Instant government-grade verification</div></div>
+          <span class="tag tag-green">Recommended</span>
+        </div>
+      </div>
+      <div class="card fade-up fade-up-1" style="padding:24px;text-align:left">
+        <div style="display:flex;align-items:center;gap:20px">
+          <div style="width:56px;height:56px;border-radius:14px;background:var(--bg-muted);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">📄</div>
+          <div style="flex:1"><div style="font-size:17px;font-weight:600">Passport scan</div><div style="font-size:13px;color:var(--text-sec);margin-top:4px">Manual review — 1-2 business days</div></div>
+          <span style="color:var(--text-ter);font-size:18px">›</span>
+        </div>
+      </div>
+      <div class="info-box info-box-muted fade-up fade-up-2" style="margin-top:24px;text-align:left">
+        <span>🔒</span>
+        <p style="color:var(--text-sec)">Your data is encrypted end-to-end and processed in accordance with 152-FZ. We never share personal information with third parties.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 2 — ESIA FLOW ═══ -->
+<div class="screen" id="screen-2">
+  <nav class="top-nav"><div class="left"><button class="back-btn" onclick="goTo(1)">← Back</button><div class="logo">One-Tap <em>Rental</em></div></div><div class="right"><span class="step-label">ESIA Verification</span><div class="avatar">A</div></div></nav>
+  <div class="centered-layout">
+    <div class="centered-content" id="esia-form">
+      <h2 style="font-family:var(--font-display);font-size:28px;font-weight:400;margin-bottom:8px">Sign in with <em>Gosuslugi</em></h2>
+      <p style="font-size:14px;color:var(--text-sec);margin-bottom:28px">Enter your credentials to verify your identity</p>
+      <div style="margin-bottom:20px"><label class="input-label">Phone, email, or SNILS</label><input type="text" class="input-field" placeholder="+7 (___) ___-__-__"></div>
+      <div style="margin-bottom:28px"><label class="input-label">Password</label><input type="password" class="input-field" placeholder="Enter password"></div>
+      <div class="info-box info-box-accent" style="margin-bottom:28px"><span>🛡️</span><p style="color:var(--accent-hover)">Secure connection. Credentials are transmitted directly to ESIA and not stored by One-Tap Rental.</p></div>
+      <button class="btn btn-accent btn-full" onclick="esiaVerify()">Sign in and verify</button>
+    </div>
+    <div class="centered-content" id="esia-loading" style="display:none;text-align:center">
+      <div style="width:56px;height:56px;border-radius:28px;border:3px solid var(--border);border-top-color:var(--accent);animation:spin 1s linear infinite;margin:0 auto 20px"></div>
+      <h2 style="font-size:20px;font-weight:700">Verifying identity...</h2>
+      <p style="font-size:14px;color:var(--text-sec);margin-top:8px">Connecting to ESIA</p>
+    </div>
+    <div class="centered-content" id="esia-done" style="display:none;text-align:center">
+      <div style="width:80px;height:80px;border-radius:40px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:40px">✓</div>
+      <h2 style="font-family:var(--font-display);font-size:28px;font-weight:400">Identity <em>verified</em></h2>
+      <p style="font-size:15px;color:var(--text-sec);margin:8px 0 32px">Your identity has been confirmed via ESIA. You can now contact property owners.</p>
+      <button class="btn btn-accent" style="padding:14px 48px" onclick="goTo(3)">Continue to listing</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 3 — CHAT ═══ -->
+<div class="screen" id="screen-3">
+  <nav class="top-nav"><div class="left"><button class="back-btn" onclick="goTo(2)">← Back</button><div class="logo">One-Tap <em>Rental</em></div></div><div class="right"><span class="step-label">Messages</span><div class="avatar">A</div></div></nav>
+  <div class="chat-layout">
+    <div class="chat-sidebar">
+      <div class="chat-sidebar-search"><div class="s0-search-input" style="font-size:13px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#AEAEB2" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21" stroke-linecap="round"/></svg> Search conversations</div></div>
+      <div class="chat-contact active">
+        <div class="chat-contact-avatar">AP</div>
+        <div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:600">Alexei Petrov</span><span style="font-size:11px;color:var(--text-sec)">10:36</span></div><p style="font-size:12px;color:var(--text-sec);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px">📋 Viewing invitation sent...</p></div>
+      </div>
+    </div>
+    <div class="chat-main">
+      <div class="chat-header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="chat-contact-avatar" style="width:40px;height:40px;font-size:14px">AP</div>
+          <div><div style="font-size:15px;font-weight:600">Alexei Petrov <span style="color:var(--green)">✓</span></div><div style="font-size:12px;color:var(--green)">Online</div></div>
+        </div>
+        <div class="card" style="padding:8px 14px;display:flex;gap:10px;align-items:center">
+          <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200&h=200&fit=crop" style="width:40px;height:40px;border-radius:8px;object-fit:cover" onerror="this.style.display='none'">
+          <div><div style="font-size:13px;font-weight:600">2BR Khamovniki</div><div style="font-size:11px;color:var(--text-sec)">₽52,000/mo</div></div>
+        </div>
+      </div>
+      <div class="chat-messages">
+        <div class="chat-bubble chat-bubble-owner fade-up">Hello! The apartment at Lva Tolstogo 23 is available from June 1. Would you like to schedule a viewing?<div class="chat-bubble-time">10:32</div></div>
+        <div class="chat-bubble chat-bubble-user fade-up fade-up-1">Yes, I am interested. Is Saturday afternoon convenient for a viewing?<div class="chat-bubble-time">10:35</div></div>
+        <div class="chat-bubble chat-bubble-owner fade-up fade-up-2">Saturday at 14:00 works perfectly. I will send a viewing confirmation right away.<div class="chat-bubble-time">10:36</div></div>
+        <div class="chat-bubble chat-bubble-system fade-up fade-up-3">📋 Viewing invitation sent — Saturday, June 7, 14:00<br>Ul. Lva Tolstogo, 23, kv. 15</div>
+      </div>
+      <div class="chat-actions">
+        <button class="btn btn-outline btn-sm" onclick="goTo(4)">📅 Confirm viewing</button>
+        <button class="btn btn-outline btn-sm">📄 Request documents</button>
+      </div>
+      <div class="chat-input-row">
+        <button style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-sec)">+</button>
+        <input class="chat-input" placeholder="Type a message...">
+        <button class="chat-send"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9"/></svg></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 4 — VIEWING ═══ -->
+<div class="screen" id="screen-4">
+  <nav class="top-nav"><div class="left"><button class="back-btn" onclick="goTo(3)">← Back</button><div class="logo">One-Tap <em>Rental</em></div></div><div class="right"><span class="step-label">Viewing Confirmation</span><div class="progress-bar"><div class="step done"></div><div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div></div><div class="avatar">A</div></div></nav>
+  <div class="split-layout">
+    <div class="viewing-map">
+      <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200&h=800&fit=crop" alt="Map" onerror="this.style.display='none'">
+      <div class="viewing-pin"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></div>
+    </div>
+    <div class="split-side">
+      <span class="tag tag-orange">Upcoming</span>
+      <h2 style="font-family:var(--font-display);font-size:26px;font-weight:400;margin:12px 0 4px">Apartment Viewing</h2>
+      <p style="font-size:14px;color:var(--text-sec);margin-bottom:24px">Spacious 2BR — Khamovniki</p>
+      <div class="card" style="padding:24px;margin-bottom:20px">
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border-light)"><div style="width:40px;height:40px;border-radius:10px;background:var(--bg-muted);display:flex;align-items:center;justify-content:center">📅</div><div><div style="font-size:12px;color:var(--text-sec)">Date</div><div style="font-size:15px;font-weight:500">Saturday, June 7, 2025</div></div></div>
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border-light)"><div style="width:40px;height:40px;border-radius:10px;background:var(--bg-muted);display:flex;align-items:center;justify-content:center">🕑</div><div><div style="font-size:12px;color:var(--text-sec)">Time</div><div style="font-size:15px;font-weight:500">14:00 — 14:30</div></div></div>
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border-light)"><div style="width:40px;height:40px;border-radius:10px;background:var(--bg-muted);display:flex;align-items:center;justify-content:center">📍</div><div><div style="font-size:12px;color:var(--text-sec)">Address</div><div style="font-size:15px;font-weight:500">Ul. Lva Tolstogo, 23, kv. 15</div></div></div>
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0"><div style="width:40px;height:40px;border-radius:10px;background:var(--bg-muted);display:flex;align-items:center;justify-content:center">👤</div><div><div style="font-size:12px;color:var(--text-sec)">Contact</div><div style="font-size:15px;font-weight:500">Alexei Petrov (Owner)</div></div></div>
+      </div>
+      <div class="info-box info-box-orange" style="margin-bottom:24px"><span>⚠️</span><p style="color:#92400E">Please bring a valid ID document for on-site verification.</p></div>
+      <div style="display:flex;gap:12px">
+        <button class="btn btn-outline" style="flex:1">Reschedule</button>
+        <button class="btn btn-accent" style="flex:1" onclick="goTo(5)">Confirm viewing</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 5 — TERM SHEET ═══ -->
+<div class="screen" id="screen-5">
+  <nav class="top-nav"><div class="left"><button class="back-btn" onclick="goTo(4)">← Back</button><div class="logo">One-Tap <em>Rental</em></div></div><div class="right"><span class="step-label">Term Sheet</span><div class="progress-bar"><div class="step done"></div><div class="step done"></div><div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div></div><div class="avatar">A</div></div></nav>
+  <div class="centered-layout">
+    <div class="centered-content centered-wide">
+      <h2 style="font-family:var(--font-display);font-size:28px;font-weight:400;margin-bottom:4px">Review and confirm <em>terms</em></h2>
+      <p style="font-size:14px;color:var(--text-sec);margin-bottom:24px">Both parties must agree to all terms before proceeding.</p>
+      <div class="card" style="padding:0;margin-bottom:20px;overflow:hidden" id="terms-card">
+        <div class="term-row" onclick="toggleTerm(this)"><div style="display:flex;align-items:center;gap:14px"><div class="term-checkbox"></div><span style="font-size:15px">Monthly rent</span></div><span style="font-size:15px;font-weight:600">₽52,000</span></div>
+        <div class="term-row" onclick="toggleTerm(this)"><div style="display:flex;align-items:center;gap:14px"><div class="term-checkbox"></div><span style="font-size:15px">Security deposit</span></div><span style="font-size:15px;font-weight:600">₽52,000 (1 month)</span></div>
+        <div class="term-row" onclick="toggleTerm(this)"><div style="display:flex;align-items:center;gap:14px"><div class="term-checkbox"></div><span style="font-size:15px">Lease term</span></div><span style="font-size:15px;font-weight:600">11 months</span></div>
+        <div class="term-row" onclick="toggleTerm(this)"><div style="display:flex;align-items:center;gap:14px"><div class="term-checkbox"></div><span style="font-size:15px">Move-in date</span></div><span style="font-size:15px;font-weight:600">June 15, 2025</span></div>
+      </div>
+      <div class="card" style="padding:20px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="color:var(--accent)">📄</span><span style="font-size:15px;font-weight:600">Additional conditions</span></div>
+        <p style="font-size:13px;color:var(--text-sec);line-height:1.6">Pets allowed with prior approval. No smoking indoors. Utilities paid separately (approx. ₽6,000/mo). Landlord responsible for structural maintenance.</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px"><span style="color:var(--accent)">🛡️</span><span style="font-size:12px;color:var(--text-sec)">Owner confirmed these terms on June 8, 2025</span></div>
+      <button class="btn btn-accent btn-full" id="terms-btn" onclick="goTo(6)" disabled>Confirm all terms (0/4)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 6 — CONTRACT ═══ -->
+<div class="screen" id="screen-6">
+  <nav class="top-nav"><div class="left"><button class="back-btn" onclick="goTo(5)">← Back</button><div class="logo">One-Tap <em>Rental</em></div></div><div class="right"><span class="step-label">Contract Review</span><div class="progress-bar"><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step"></div><div class="step"></div><div class="step"></div></div><div class="avatar">A</div></div></nav>
+  <div class="split-layout">
+    <div class="split-main">
+      <div class="card" style="padding:28px;height:calc(100vh - 180px)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="color:var(--accent);font-size:20px">📄</span><span style="font-size:16px;font-weight:600">Lease_Agreement.pdf</span></div>
+          <span class="tag tag-accent">12 pages</span>
+        </div>
+        <div class="contract-preview" style="height:calc(100% - 60px)">
+          <div style="font-size:16px;font-weight:700;text-align:center;margin-bottom:8px">LEASE AGREEMENT</div>
+          <div style="font-size:13px;text-align:center;color:var(--text-sec);margin-bottom:24px">No. OT-2025-00847</div>
+          <div class="contract-line" style="width:85%"></div><div class="contract-line" style="width:100%"></div><div class="contract-line" style="width:92%"></div><div class="contract-line" style="width:70%"></div><div class="contract-line" style="width:100%"></div><div class="contract-line" style="width:88%"></div><div class="contract-line" style="width:95%"></div><div class="contract-line" style="width:60%"></div>
+          <div style="height:24px"></div>
+          <div class="contract-line" style="width:78%"></div><div class="contract-line" style="width:100%"></div><div class="contract-line" style="width:85%"></div><div class="contract-line" style="width:92%"></div><div class="contract-line" style="width:66%"></div><div class="contract-line" style="width:100%"></div><div class="contract-line" style="width:74%"></div><div class="contract-line" style="width:88%"></div>
+        </div>
+      </div>
+    </div>
+    <div style="width:360px;flex-shrink:0">
+      <div class="section-label">Key clauses</div>
+      <div style="margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border-light)"><span style="color:var(--green)">✓</span> Rent and payment schedule</div>
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border-light)"><span style="color:var(--green)">✓</span> Security deposit terms</div>
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border-light)"><span style="color:var(--green)">✓</span> Maintenance responsibilities</div>
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border-light)"><span style="color:var(--green)">✓</span> Early termination clause</div>
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 0"><span style="color:var(--green)">✓</span> Condition report requirement</div>
+      </div>
+      <div class="section-label">Electronic signature</div>
+      <div class="signature-box" id="sig-box" onclick="toggleSignature()">
+        <div id="sig-unsigned"><span style="font-size:32px;color:var(--text-ter)">✍️</span><p style="font-size:14px;color:var(--text-sec);margin-top:10px">Click to sign with ESIA credentials</p></div>
+        <div id="sig-signed" style="display:none"><span style="font-size:32px;color:var(--green)">✓</span><p style="font-size:14px;font-weight:600;color:var(--green);margin-top:10px">Signed by you</p><p style="font-size:12px;color:var(--text-sec);margin-top:4px">June 10, 2025 at 15:42</p></div>
+      </div>
+      <button class="btn btn-accent btn-full" style="margin-top:24px" id="contract-btn" onclick="goTo(7)" disabled>Sign to continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 7 — PAYMENT ═══ -->
+<div class="screen" id="screen-7">
+  <nav class="top-nav"><div class="left"><button class="back-btn" onclick="goTo(6)">← Back</button><div class="logo">One-Tap <em>Rental</em></div></div><div class="right"><span class="step-label">Payment</span><div class="progress-bar"><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step"></div><div class="step"></div></div><div class="avatar">A</div></div></nav>
+  <div class="centered-layout">
+    <div class="centered-content centered-wide">
+      <h2 style="font-family:var(--font-display);font-size:28px;font-weight:400;margin-bottom:24px">Payment <em>summary</em></h2>
+      <div class="card" style="padding:24px;margin-bottom:24px">
+        <div class="payment-row"><span style="color:var(--text-sec)">First month rent</span><span style="font-weight:500">₽52,000</span></div>
+        <div class="payment-row"><span style="color:var(--text-sec)">Security deposit</span><span style="font-weight:500">₽52,000</span></div>
+        <div class="payment-row"><span style="color:var(--text-sec)">Service fee (5%)</span><span style="font-weight:500">₽2,600</span></div>
+        <div class="payment-total"><span>Total</span><span>₽106,600</span></div>
+      </div>
+      <div class="section-label">Payment method</div>
+      <div class="card payment-method selected" onclick="selectPayment(this)"><div style="display:flex;align-items:center;gap:14px"><div class="payment-radio"><div class="payment-radio-dot"></div></div><span style="font-size:15px">Bank card •••• 4582</span></div></div>
+      <div class="card payment-method" onclick="selectPayment(this)"><div style="display:flex;align-items:center;gap:14px"><div class="payment-radio"><div class="payment-radio-dot"></div></div><span style="font-size:15px">SBP (Fast Payment System)</span></div></div>
+      <div class="card payment-method" onclick="selectPayment(this)"><div style="display:flex;align-items:center;gap:14px"><div class="payment-radio"><div class="payment-radio-dot"></div></div><span style="font-size:15px">Bank transfer</span></div></div>
+      <div class="info-box info-box-accent" style="margin-top:20px"><span>🛡️</span><p style="color:var(--accent-hover)">Deposit held in escrow. Released to owner only after the condition report is signed by both parties.</p></div>
+      <button class="btn btn-accent btn-full" style="margin-top:24px" onclick="goTo(8)">🔒 Pay ₽106,600</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 8 — CONDITION ROOMS ═══ -->
+<div class="screen" id="screen-8">
+  <nav class="top-nav"><div class="left"><button class="back-btn" onclick="goTo(7)">← Back</button><div class="logo">One-Tap <em>Rental</em></div></div><div class="right"><span class="step-label">Condition Report</span><div class="progress-bar"><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step"></div></div><div class="avatar">A</div></div></nav>
+  <div style="padding:32px 48px;flex:1;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h2 style="font-family:var(--font-display);font-size:28px;font-weight:400">Room-by-room <em>inspection</em></h2>
+      <div style="display:flex;align-items:center;gap:16px"><span style="font-size:14px;color:var(--text-sec)">26 of 52 items</span><div style="background:var(--bg-muted);border-radius:var(--r-sm);padding:8px 16px;font-size:18px;font-weight:700;color:var(--accent)">50%</div></div>
+    </div>
+    <div style="height:4px;background:var(--border);border-radius:2px;margin-bottom:28px;overflow:hidden"><div style="height:100%;width:50%;background:var(--accent);border-radius:2px"></div></div>
+    <div class="rooms-grid">
+      <div class="card card-clickable room-card fade-up" onclick="goTo(9)"><div class="room-card-img"><img src="https://images.unsplash.com/photo-1585412727339-54e4bae3bbf9?w=600&h=400&fit=crop" alt="Living Room" onerror="this.parentElement.style.background='var(--bg-muted)'"></div><div class="room-card-body"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:600">Living Room</span><span style="font-size:12px;color:var(--text-sec)">8/12</span></div><div class="room-progress"><div class="room-progress-fill" style="width:67%;background:var(--accent)"></div></div></div></div>
+      <div class="card room-card fade-up fade-up-1"><div class="room-card-img"><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=400&fit=crop" alt="Kitchen" onerror="this.parentElement.style.background='var(--bg-muted)'"><div style="position:absolute;top:10px;right:10px"><span class="tag tag-green">Complete</span></div></div><div class="room-card-body"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:600">Kitchen</span><span style="font-size:12px;color:var(--text-sec)">15/15</span></div><div class="room-progress"><div class="room-progress-fill" style="width:100%;background:var(--green)"></div></div></div></div>
+      <div class="card room-card fade-up fade-up-2"><div class="room-card-img"><img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=600&h=400&fit=crop" alt="Bedroom" onerror="this.parentElement.style.background='var(--bg-muted)'"></div><div class="room-card-body"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:600">Bedroom</span><span style="font-size:12px;color:var(--text-sec)">3/10</span></div><div class="room-progress"><div class="room-progress-fill" style="width:30%;background:var(--accent)"></div></div></div></div>
+      <div class="card room-card fade-up fade-up-3"><div class="room-card-img"><img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&h=400&fit=crop" alt="Bathroom" onerror="this.parentElement.style.background='var(--bg-muted)'"></div><div class="room-card-body"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:600">Bathroom</span><span style="font-size:12px;color:var(--text-sec)">0/9</span></div><div class="room-progress"><div class="room-progress-fill" style="width:0%;background:var(--accent)"></div></div></div></div>
+      <div class="card room-card fade-up fade-up-4"><div class="room-card-img"><img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&h=400&fit=crop" alt="Hallway" onerror="this.parentElement.style.background='var(--bg-muted)'"></div><div class="room-card-body"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:600">Hallway</span><span style="font-size:12px;color:var(--text-sec)">0/6</span></div><div class="room-progress"><div class="room-progress-fill" style="width:0%;background:var(--accent)"></div></div></div></div>
+      <div class="card room-add" onclick="">
+        <span style="font-size:28px">+</span>
+        <span style="font-size:13px">Add room</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 9 — ITEM DETAIL ═══ -->
+<div class="screen" id="screen-9">
+  <nav class="top-nav"><div class="left"><button class="back-btn" onclick="goTo(8)">← Back</button><div class="logo">One-Tap <em>Rental</em></div></div><div class="right"><span class="step-label">Living Room — Item 5/12</span><div class="progress-bar"><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step"></div></div><div class="avatar">A</div></div></nav>
+  <div class="split-layout">
+    <div style="flex:1;display:flex;flex-direction:column;gap:12px">
+      <div class="item-photo"><img src="https://images.unsplash.com/photo-1585412727339-54e4bae3bbf9?w=1200&h=800&fit=crop" alt="Sofa" onerror="this.parentElement.style.background='var(--bg-muted)'"><div style="position:absolute;top:12px;left:12px"><span class="tag tag-white">1 / 4</span></div><div style="position:absolute;bottom:12px;right:12px"><button class="btn btn-outline btn-sm" style="background:rgba(255,255,255,0.9)">📷 Retake</button></div></div>
+      <div class="item-thumbnails">
+        <div class="item-thumb active"><img src="https://images.unsplash.com/photo-1585412727339-54e4bae3bbf9?w=200&h=200&fit=crop" onerror="this.parentElement.style.background='var(--bg-muted)'"></div>
+        <div class="item-thumb"><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop" onerror="this.parentElement.style.background='var(--bg-muted)'"></div>
+        <div class="item-thumb"><img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=200&h=200&fit=crop" onerror="this.parentElement.style.background='var(--bg-muted)'"></div>
+        <div class="item-thumb" style="border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text-ter)">+</div>
+      </div>
+    </div>
+    <div style="width:360px;flex-shrink:0">
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:4px">Sofa — left section</h3>
+      <p style="font-size:13px;color:var(--text-sec);margin-bottom:24px">Living Room · Item 5 of 12</p>
+      <div class="section-label">Condition</div>
+      <div style="display:flex;gap:8px;margin-bottom:24px">
+        <button class="condition-btn" onclick="selectCondition(this,'#2DA44E')" style="border-color:var(--border)">Excellent</button>
+        <button class="condition-btn selected" onclick="selectCondition(this,'#1155CC')" style="border-color:var(--accent);color:var(--accent);background:var(--bg-accent-pale)">Good</button>
+        <button class="condition-btn" onclick="selectCondition(this,'#D97706')" style="border-color:var(--border)">Fair</button>
+        <button class="condition-btn" onclick="selectCondition(this,'#CF222E')" style="border-color:var(--border)">Poor</button>
+      </div>
+      <div class="section-label">Notes</div>
+      <textarea class="input-field" style="height:100px;resize:none" placeholder="Describe condition, damage, or wear..."></textarea>
+      <div style="display:flex;gap:12px;margin-top:28px">
+        <button class="btn btn-outline" style="flex:1">Previous</button>
+        <button class="btn btn-accent" style="flex:1" onclick="goTo(10)">Next item</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 10 — JOINT SIGNING ═══ -->
+<div class="screen" id="screen-10">
+  <nav class="top-nav"><div class="left"><button class="back-btn" onclick="goTo(9)">← Back</button><div class="logo">One-Tap <em>Rental</em></div></div><div class="right"><span class="step-label">Sign Condition Report</span><div class="progress-bar"><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step"></div></div><div class="avatar">A</div></div></nav>
+  <div class="centered-layout">
+    <div class="centered-content centered-wide" style="text-align:center">
+      <div style="width:72px;height:72px;border-radius:36px;background:var(--bg-accent-pale);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:36px">📄</div>
+      <h2 style="font-family:var(--font-display);font-size:28px;font-weight:400">Condition <em>Report</em></h2>
+      <p style="font-size:14px;color:var(--text-sec);margin:6px 0 24px">52 items documented across 5 rooms</p>
+      <div class="card" style="padding:24px;margin-bottom:20px">
+        <div style="display:flex;justify-content:space-around">
+          <div><div style="font-size:28px;font-weight:700;color:var(--green)">38</div><div style="font-size:12px;color:var(--text-sec)">Excellent</div></div>
+          <div><div style="font-size:28px;font-weight:700;color:var(--accent)">10</div><div style="font-size:12px;color:var(--text-sec)">Good</div></div>
+          <div><div style="font-size:28px;font-weight:700;color:var(--orange)">3</div><div style="font-size:12px;color:var(--text-sec)">Fair</div></div>
+          <div><div style="font-size:28px;font-weight:700;color:var(--red)">1</div><div style="font-size:12px;color:var(--text-sec)">Poor</div></div>
+        </div>
+      </div>
+      <div class="section-label" style="text-align:left">Signatures required</div>
+      <div class="card signer-card" id="tenant-signer" style="text-align:left" onclick="signTenant()">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="signer-avatar" style="background:var(--bg-muted)"><span style="font-size:22px">✍️</span></div>
+          <div><div style="font-size:15px;font-weight:600">You (Tenant)</div><div style="font-size:12px;color:var(--text-sec)" id="tenant-status">Click to sign with ESIA</div></div>
+        </div>
+      </div>
+      <div class="card signer-card" id="owner-signer" style="text-align:left">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="signer-avatar" style="background:var(--bg-muted)"><div class="spinner"></div></div>
+          <div><div style="font-size:15px;font-weight:600">Alexei Petrov (Owner)</div><div style="font-size:12px;color:var(--text-sec)" id="owner-status">Waiting for signature...</div></div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="sim-owner-btn" style="display:none;margin:12px auto" onclick="signOwner()">Simulate owner signing</button>
+      <button class="btn btn-accent btn-full" id="handover-btn" style="margin-top:20px" onclick="goTo(11)" disabled>Both signatures required</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 11 — DASHBOARD ═══ -->
+<div class="screen" id="screen-11">
+  <nav class="top-nav"><div class="left"><div class="logo">One-Tap <em>Rental</em></div></div><div class="right"><div class="avatar">A</div></div></nav>
+  <div style="padding:32px 48px;flex:1;overflow-y:auto">
+    <div class="dash-hero fade-up">
+      <div><h1>Handover <em style="font-family:var(--font-display);font-style:italic;color:rgba(255,255,255,0.8)">complete</em></h1><p>Welcome to your new home at Khamovniki</p></div>
+      <div class="dash-key-icon"><span style="font-size:36px">🔑</span></div>
+    </div>
+    <div style="display:flex;gap:28px">
+      <div style="flex:1">
+        <div class="card fade-up fade-up-1" style="padding:20px;margin-bottom:20px">
+          <div style="display:flex;gap:16px">
+            <div style="width:100px;height:80px;border-radius:var(--r-sm);overflow:hidden;flex-shrink:0"><img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.background='var(--bg-muted)'"></div>
+            <div><div style="font-size:17px;font-weight:600">Spacious 2BR Apartment</div><div style="font-size:13px;color:var(--text-sec);margin:4px 0 8px">Khamovniki, Moscow</div><span class="tag tag-green">Active lease</span></div>
+          </div>
+        </div>
+        <div class="dash-grid fade-up fade-up-2">
+          <div class="card dash-action"><span style="font-size:20px">📄</span><div style="font-size:14px;font-weight:600;margin-top:10px">Lease Agreement</div><div style="font-size:12px;color:var(--text-sec);margin-top:2px">Signed June 10</div></div>
+          <div class="card dash-action"><span style="font-size:20px">📷</span><div style="font-size:14px;font-weight:600;margin-top:10px">Condition Report</div><div style="font-size:12px;color:var(--text-sec);margin-top:2px">52 items, signed</div></div>
+          <div class="card dash-action"><span style="font-size:20px">💳</span><div style="font-size:14px;font-weight:600;margin-top:10px">Payment History</div><div style="font-size:12px;color:var(--text-sec);margin-top:2px">1 of 11 paid</div></div>
+          <div class="card dash-action"><span style="font-size:20px">💬</span><div style="font-size:14px;font-weight:600;margin-top:10px">Contact Owner</div><div style="font-size:12px;color:var(--text-sec);margin-top:2px">Alexei Petrov</div></div>
+        </div>
+      </div>
+      <div style="width:320px" class="fade-up fade-up-3">
+        <div class="section-label">Activity timeline</div>
+        <div class="timeline-item"><div class="timeline-dot" style="background:var(--accent)"></div><div class="timeline-line"></div><div><div style="font-size:14px;font-weight:500">Handover completed</div><div style="font-size:11px;color:var(--text-sec);margin-top:2px">Jun 15</div></div></div>
+        <div class="timeline-item"><div class="timeline-dot" style="background:var(--green)"></div><div class="timeline-line"></div><div><div style="font-size:14px;font-weight:500">Condition report signed</div><div style="font-size:11px;color:var(--text-sec);margin-top:2px">Jun 15</div></div></div>
+        <div class="timeline-item"><div class="timeline-dot" style="background:var(--green)"></div><div class="timeline-line"></div><div><div style="font-size:14px;font-weight:500">Contract signed</div><div style="font-size:11px;color:var(--text-sec);margin-top:2px">Jun 10</div></div></div>
+        <div class="timeline-item"><div class="timeline-dot" style="background:var(--green)"></div><div class="timeline-line"></div><div><div style="font-size:14px;font-weight:500">Payment processed — ₽106,600</div><div style="font-size:11px;color:var(--text-sec);margin-top:2px">Jun 10</div></div></div>
+        <div class="timeline-item"><div class="timeline-dot" style="background:var(--green)"></div><div class="timeline-line"></div><div><div style="font-size:14px;font-weight:500">Terms confirmed</div><div style="font-size:11px;color:var(--text-sec);margin-top:2px">Jun 8</div></div></div>
+        <div class="timeline-item"><div class="timeline-dot" style="background:var(--green)"></div><div class="timeline-line"></div><div><div style="font-size:14px;font-weight:500">Viewing completed</div><div style="font-size:11px;color:var(--text-sec);margin-top:2px">Jun 7</div></div></div>
+        <div class="timeline-item"><div class="timeline-dot" style="background:var(--green)"></div><div><div style="font-size:14px;font-weight:500">Identity verified via ESIA</div><div style="font-size:11px;color:var(--text-sec);margin-top:2px">Jun 5</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Screen Navigation ───
+const screenNames = [
+  "0 · Listing + Map", "1 · ID Gate", "2 · ESIA Flow", "3 · Chat",
+  "4 · Viewing", "5 · Term Sheet", "6 · Contract", "7 · Payment",
+  "8 · Condition Rooms", "9 · Item Detail", "10 · Joint Sign", "11 · Dashboard"
+];
+
+const nav = document.getElementById('screenNav');
+screenNames.forEach((name, i) => {
+  const btn = document.createElement('button');
+  btn.textContent = name;
+  btn.onclick = () => goTo(i);
+  if (i === 0) btn.classList.add('active');
+  nav.appendChild(btn);
+});
+
+function goTo(i) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + i).classList.add('active');
+  document.querySelectorAll('.screen-nav button').forEach((b, j) => {
+    b.classList.toggle('active', j === i);
+  });
+  window.scrollTo(0, 0);
+}
+
+// ─── ESIA Flow ───
+function esiaVerify() {
+  document.getElementById('esia-form').style.display = 'none';
+  document.getElementById('esia-loading').style.display = 'block';
+  setTimeout(() => {
+    document.getElementById('esia-loading').style.display = 'none';
+    document.getElementById('esia-done').style.display = 'block';
+  }, 2000);
+}
+
+// ─── Term Sheet ───
+function toggleTerm(el) {
+  el.classList.toggle('checked');
+  const cb = el.querySelector('.term-checkbox');
+  cb.innerHTML = el.classList.contains('checked') ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="5 12 10 17 19 8"/></svg>' : '';
+  updateTermsBtn();
+}
+function updateTermsBtn() {
+  const checked = document.querySelectorAll('#terms-card .term-row.checked').length;
+  const btn = document.getElementById('terms-btn');
+  btn.disabled = checked < 4;
+  btn.textContent = checked === 4 ? 'Proceed to contract' : `Confirm all terms (${checked}/4)`;
+}
+
+// ─── Contract Signature ───
+function toggleSignature() {
+  const box = document.getElementById('sig-box');
+  const signed = box.classList.toggle('signed');
+  document.getElementById('sig-unsigned').style.display = signed ? 'none' : 'block';
+  document.getElementById('sig-signed').style.display = signed ? 'block' : 'none';
+  const btn = document.getElementById('contract-btn');
+  btn.disabled = !signed;
+  btn.textContent = signed ? 'Submit signed contract' : 'Sign to continue';
+}
+
+// ─── Payment Method ───
+function selectPayment(el) {
+  document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ─── Condition Button ───
+function selectCondition(el, color) {
+  document.querySelectorAll('.condition-btn').forEach(b => {
+    b.classList.remove('selected');
+    b.style.borderColor = 'var(--border)';
+    b.style.color = 'var(--text-sec)';
+    b.style.background = 'var(--bg-card)';
+  });
+  el.classList.add('selected');
+  el.style.borderColor = color;
+  el.style.color = color;
+  el.style.background = color + '10';
+}
+
+// ─── Joint Signing ───
+let tenantSigned = false, ownerSigned = false;
+function signTenant() {
+  if (tenantSigned) return;
+  tenantSigned = true;
+  const el = document.getElementById('tenant-signer');
+  el.classList.add('signed');
+  el.querySelector('.signer-avatar').innerHTML = '<span style="font-size:24px;color:var(--green)">✓</span>';
+  el.querySelector('.signer-avatar').style.background = 'var(--green-bg)';
+  document.getElementById('tenant-status').textContent = 'Signed June 15, 15:30';
+  document.getElementById('tenant-status').style.color = 'var(--green)';
+  document.getElementById('sim-owner-btn').style.display = 'block';
+}
+function signOwner() {
+  ownerSigned = true;
+  const el = document.getElementById('owner-signer');
+  el.classList.add('signed');
+  el.querySelector('.signer-avatar').innerHTML = '<span style="font-size:24px;color:var(--green)">✓</span>';
+  el.querySelector('.signer-avatar').style.background = 'var(--green-bg)';
+  document.getElementById('owner-status').textContent = 'Signed';
+  document.getElementById('owner-status').style.color = 'var(--green)';
+  document.getElementById('sim-owner-btn').style.display = 'none';
+  const btn = document.getElementById('handover-btn');
+  btn.disabled = false;
+  btn.textContent = 'Complete handover';
+  btn.classList.remove('btn-accent');
+  btn.classList.add('btn-success');
+}
+</script>
+</body>
+</html>
