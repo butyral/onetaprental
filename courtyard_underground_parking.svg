@@ -1,0 +1,16 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="#3A3A3A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+
+    <!-- parking sign -->
+    <rect x="10" y="9" width="27" height="27" rx="5"/>
+    <path d="M20 30V16h8a5 5 0 0 1 0 10h-8"/>
+    <!-- underground / down arrow -->
+    <path d="M47 11v22"/>
+    <path d="M39 25l8 8 8-8"/>
+    <!-- garage / courtyard line -->
+    <path d="M8 54h48"/>
+    <path d="M16 54V43h32v11"/>
+    <path d="M22 48h20"/>
+
+  </g>
+</svg>

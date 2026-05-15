@@ -1,0 +1,16 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="#3A3A3A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+
+    <!-- wheelchair user -->
+    <circle cx="25" cy="14" r="4"/>
+    <path d="M25 20v11"/>
+    <path d="M25 31h10"/>
+    <path d="M22 27h10l5 8"/>
+    <circle cx="27" cy="42" r="10"/>
+    <path d="M37 42h10"/>
+    <!-- ramp slope -->
+    <path d="M8 54h48"/>
+    <path d="M36 54l20-18"/>
+
+  </g>
+</svg>
